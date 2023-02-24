@@ -72,6 +72,8 @@ func (app *Config) errorJSON(w http.ResponseWriter, err error, status ...int) er
 	payload.Error = true
 	payload.Message = err.Error()
 
+	app.Log.Errorf("found an error %v", payload)
+
 	return app.writeJSON(w, statusCode, payload)
 }
 

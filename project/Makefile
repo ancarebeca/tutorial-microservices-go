@@ -1,7 +1,7 @@
 FRONT_END_BINARY=frontApp
 BROKER_BINARY=brokerApp
 AUTH_BINARY=authApp
-LOGGER_BINARY=loggerApp
+LOGGER_BINARY=loggerServiceApp
 
 ## up: starts all containers in the background without forcing build
 up:
@@ -56,3 +56,20 @@ stop:
 	@echo "Stopping front end..."
 	@-pkill -SIGTERM -f "./${FRONT_END_BINARY}"
 	@echo "Stopped front end!"
+
+POSTGRES_CONTAINER_NAME:=postgres
+PWD = $(shell pwd)
+APP_DB_USERNAME:=postgres
+APP_DB_PORT:=5432
+APP_DB_PWD:=password
+APP_DB_NAME:=users
+
+postgres-migrate:
+	@echo " * Applying Postgres SQL migrations '$(POSTGRES_CONTAINER_NAME)'"
+	docker run \
+		-v $(PWD)/db-data/postgres/migrations:/migrations \
+		--rm \
+		--network host \
+		migrate/migrate \
+		-path=/migrations/ \
+		-database postgres://$(APP_DB_USERNAME):$(APP_DB_PWD)@localhost:$(APP_DB_PORT)/$(APP_DB_NAME)?sslmode=disable up

@@ -2,12 +2,13 @@ package data
 
 import (
 	"context"
+	"log"
+	"time"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"log"
-	"time"
 )
 
 var client *mongo.Client
@@ -36,8 +37,8 @@ func (l *LogEntry) Insert(entry LogEntry) error {
 	collection := client.Database("logs").Collection("logs")
 
 	_, err := collection.InsertOne(context.TODO(), LogEntry{
-		Name:      entry.Name,
-		Data:      entry.Data,
+		Name: entry.Name,
+		Data: entry.Data,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	})

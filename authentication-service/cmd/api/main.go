@@ -7,7 +7,8 @@ import (
 	_ "github.com/jackc/pgconn"
 	_ "github.com/jackc/pgx/v4"
 	_ "github.com/jackc/pgx/v4/stdlib"
-	"log"
+	"github.com/sirupsen/logrus"
+	easy "github.com/t-tomalak/logrus-easy-formatter"
 	"net/http"
 	"os"
 	"time"
@@ -20,13 +21,24 @@ var counts int64
 type Config struct {
 	DB     *sql.DB
 	Models data.Models
+	Log    *logrus.Logger
 }
 
 func main() {
-	log.Println("Starting authentication service")
+	log := &logrus.Logger{
+		Out:   os.Stderr,
+		Level: logrus.DebugLevel,
+		Formatter: &easy.Formatter{
+			TimestampFormat: "2006-01-02 15:04:05",
+			LogFormat:       "[%lvl%]: %time% - %msg%\n",
+		},
+	}
+	log.SetOutput(os.Stdout)
+
+	log.Info("Starting authentication service")
 
 	// connect to DB
-	conn := connectToDB()
+	conn := connectToDB(log)
 	if conn == nil {
 		log.Panic("Can't connect to Postgres!")
 	}
@@ -35,6 +47,7 @@ func main() {
 	app := Config{
 		DB:     conn,
 		Models: data.New(conn),
+		Log:    log,
 	}
 
 	srv := &http.Server{
@@ -60,25 +73,25 @@ func openDB(dsn string) (*sql.DB, error) {
 	return db, nil
 }
 
-func connectToDB() *sql.DB {
+func connectToDB(log *logrus.Logger) *sql.DB {
 	dsn := os.Getenv("DSN")
 
 	for {
 		connection, err := openDB(dsn)
 		if err != nil {
-			log.Println("Postgres not yet ready ...")
+			log.Debugln("Postgres not yet ready ...")
 			counts++
 		} else {
-			log.Println("Connected to Postgres!")
+			log.Debugln("Connected to Postgres!")
 			return connection
 		}
 
 		if counts > 10 {
-			log.Println(err)
+			log.Errorf("something when wrong when connecting to postgress: %v\n", err)
 			return nil
 		}
 
-		log.Println("Backing off for two seconds ....")
+		log.Debugln("Backing off for two seconds ....")
 		time.Sleep(2 * time.Second)
 		continue
 	}
