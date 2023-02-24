@@ -1,6 +1,7 @@
 .DS_Store
 .idea/
 project/db-data/postgres/data/*
+project/db-data/mongo/*
 broker-service/brokerApp
 authentication-service/authApp
 logger-service/loggerApp

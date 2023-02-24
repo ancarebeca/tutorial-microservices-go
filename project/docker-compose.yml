@@ -49,7 +49,7 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: users
     volumes:
-      - ./db-data/postgres/data/:/data/
+      - ./db-data/postgres/data/:/var/lib/postgresql/data/
 
   mongo:
     image: 'mongo:4.2.16-bionic'
