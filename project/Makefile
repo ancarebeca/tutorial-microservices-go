@@ -29,16 +29,17 @@ build_broker:
 	cd ../broker-service && env GOOS=linux CGO_ENABLED=0 go build -o ${BROKER_BINARY} ./cmd/api
 	@echo "Done!"
 
-## build_auth: builds the broker binary as a linux executable
-build_auth:
-	@echo "Building broker binary..."
-	cd ../authentication-service && env GOOS=linux CGO_ENABLED=0 go build -o ${AUTH_BINARY} ./cmd/api
-	@echo "Done!"
-
 ## build_logger: builds the logger binary as a linux executable
 build_logger:
 	@echo "Building logger binary..."
 	cd ../logger-service && env GOOS=linux CGO_ENABLED=0 go build -o ${LOGGER_BINARY} ./cmd/api
+	@echo "Done!"
+
+## build_auth: builds the auth binary as a linux executable
+build_auth:
+	@echo "Building auth binary..."
+	cd ../authentication-service && env GOOS=linux CGO_ENABLED=0 go build -o ${AUTH_BINARY} ./cmd/api
+	@echo "Done!"
 
 ## build_front: builds the frone end binary
 build_front:
@@ -57,6 +58,8 @@ stop:
 	@-pkill -SIGTERM -f "./${FRONT_END_BINARY}"
 	@echo "Stopped front end!"
 
+
+#TODO: move it to .envrc file
 POSTGRES_CONTAINER_NAME:=postgres
 PWD = $(shell pwd)
 APP_DB_USERNAME:=postgres
